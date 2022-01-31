@@ -14,6 +14,7 @@
 #include <QMimeDatabase>
 #include <QMessageBox>
 #include <QToolBar>
+#include <QActionGroup>
 #include <QCompleter>
 #include <QShortcut>
 #include <QTimer>
@@ -95,7 +96,7 @@ FileDialog::FileDialog(QWidget* parent, FilePath path) :
     connect(ui->fileTypeCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
         selectNameFilter(text);
     });
-    ui->fileTypeCombo->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
+    ui->fileTypeCombo->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
     ui->fileTypeCombo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     ui->fileTypeCombo->setCurrentIndex(0);
 
@@ -203,7 +204,7 @@ FileDialog::FileDialog(QWidget* parent, FilePath path) :
         proxyModel_->setShowHidden(checked);
     });
     // also add a separate shortcut for it
-    QShortcut* shortcut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_H), this);
+    QShortcut* shortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_H), this);
     connect(shortcut, &QShortcut::activated, [this]() {
         proxyModel_->setShowHidden(!proxyModel_->showHidden());
     });
@@ -1090,10 +1091,6 @@ void FileDialog::setViewMode(FolderView::ViewMode mode) {
 
 
 void FileDialog::setFileMode(QFileDialog::FileMode mode) {
-    if(mode == QFileDialog::DirectoryOnly) {
-        // directly only is deprecated and not allowed.
-        mode = QFileDialog::Directory;
-    }
     fileMode_ = mode;
 
     // enable multiple selection?
