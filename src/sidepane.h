@@ -26,9 +26,11 @@
 
 #include "core/filepath.h"
 
-class QComboBox;
-class QVBoxLayout;
 class QWidget;
+class QVBoxLayout;
+class QHBoxLayout;
+class QLabel;
+class QPushButton;
 
 namespace Fm {
 
@@ -115,7 +117,7 @@ protected:
     bool event(QEvent* event) override;
 
 protected Q_SLOTS:
-    void onComboCurrentIndexChanged(int current);
+    void onButtonClick();
 
 private:
     void initDirTree();
@@ -123,9 +125,12 @@ private:
 private:
     Fm::FilePath currentPath_;
     QWidget* view_;
-    QComboBox* combo_;
     QVBoxLayout* verticalLayout;
+    QHBoxLayout* horLayout;
+    QLabel* label_;
+    QPushButton* button_;
     QSize iconSize_;
+    Mode mode_;
     Mode mode_;
     bool showHidden_;
     QSet<QString> restorableHiddenPlaces_;
