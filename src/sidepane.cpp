@@ -20,8 +20,12 @@
 
 #include "sidepane.h"
 #include <QEvent>
-#include <QComboBox>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QIcon>
+#include <QSize>
+#include <QLabel>
 #include <QHeaderView>
 #include "placesview.h"
 #include "dirtreeview.h"
@@ -33,19 +37,30 @@ namespace Fm {
 SidePane::SidePane(QWidget* parent):
     QWidget(parent),
     view_(nullptr),
-    combo_(nullptr),
     iconSize_(24, 24),
     mode_(ModeNone),
     showHidden_(false) {
 
     verticalLayout = new QVBoxLayout(this);
     verticalLayout->setContentsMargins(0, 0, 0, 0);
-
-    combo_ = new QComboBox(this);
-    combo_->addItem(tr("Lists")); // "Places" is already used in PlacesModel
-    combo_->addItem(tr("Directory Tree"));
-    connect(combo_, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &SidePane::onComboCurrentIndexChanged);
-    verticalLayout->addWidget(combo_);
+ 
+    horLayout = new QHBoxLayout(this);
+    horLayout->setContentsMargins(0, 0, 0, 0);
+ 
+    label_ = new QLabel(this);
+    horLayout->addWidget(label_);
+ 
+    button_ = new QPushButton(this);
+    button_->setFixedSize(QSize(30, 30));
+ 
+    connect(button_, &QPushButton::clicked, this, &SidePane::onButtonClick);
+ 
+    horLayout->addWidget(button_);
+ 
+    label_->setText(tr("Lists"));
+    button_->setIcon(QIcon::fromTheme(QLatin1String("view-list-icons")));
+ 
+    verticalLayout->addLayout(horLayout);
 }
 
 SidePane::~SidePane() {
@@ -65,9 +80,15 @@ bool SidePane::event(QEvent* event) {
     return QWidget::event(event);
 }
 
-void SidePane::onComboCurrentIndexChanged(int current) {
-    if(current != mode_) {
-        setMode(Mode(current));
+void SidePane::onButtonClick() {
+    if(mode_ == ModePlaces){
+        label_->setText(tr("Directory Tree"));
+        button_->setIcon(QIcon::fromTheme(QLatin1String("view-list-details")));
+        setMode(Mode(1));
+    } else if (mode_ == ModeDirTree){
+        label_->setText(tr("Lists"));
+        button_->setIcon(QIcon::fromTheme(QLatin1String("view-list-icons")));
+        setMode(Mode(0));
     }
 }
 
@@ -174,7 +195,6 @@ void SidePane::setMode(Mode mode) {
     }
     mode_ = mode;
 
-    combo_->setCurrentIndex(mode);
     switch(mode) {
     case ModePlaces: {
         PlacesView* placesView = new Fm::PlacesView(this);
