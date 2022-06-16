@@ -131,7 +131,6 @@ private:
     QPushButton* button_;
     QSize iconSize_;
     Mode mode_;
-    Mode mode_;
     bool showHidden_;
     QSet<QString> restorableHiddenPlaces_;
 };
